@@ -30,7 +30,7 @@ export { GenerativeModel };
  * @public
  */
 export class GoogleGenerativeAI {
-  constructor(public apiKey: string) {}
+  constructor(public apiKey: string) { }
 
   /**
    * Gets a {@link GenerativeModel} instance for the provided model name.
@@ -42,7 +42,7 @@ export class GoogleGenerativeAI {
     if (!modelParams.model) {
       throw new GoogleGenerativeAIError(
         `Must provide a model name. ` +
-          `Example: genai.getGenerativeModel({ model: 'my-model-name' })`,
+        `Example: genai.getGenerativeModel({ model: 'my-model-name' })`,
       );
     }
     return new GenerativeModel(this.apiKey, modelParams, requestOptions);
@@ -93,7 +93,89 @@ export class GoogleGenerativeAI {
         }
         throw new GoogleGenerativeAIRequestInputError(
           `Different value for "${key}" specified in modelParams` +
-            ` (${modelParams[key]}) and cachedContent (${cachedContent[key]})`,
+          ` (${modelParams[key]}) and cachedContent (${cachedContent[key]})`,
+        );
+      }
+    }
+
+    const modelParamsFromCache: ModelParams = {
+      ...modelParams,
+      model: cachedContent.model,
+      tools: cachedContent.tools,
+      toolConfig: cachedContent.toolConfig,
+      systemInstruction: cachedContent.systemInstruction,
+      cachedContent,
+    };
+    return new GenerativeModel(
+      this.apiKey,
+      modelParamsFromCache,
+      requestOptions,
+    );
+  }
+
+  /**
+  * Creates a fine tuned {@link GenerativeModel} instance for the provided model name.
+  */
+  createFineTunedGenerativeModel(
+    sourceModel: ModelParams,
+    trainingData: Partial<ModelParams>,
+    id = null,
+    displayName = null,
+    description = null,
+    temperature = null,
+    topP = null,
+    topK = null,
+    epochCount = null,
+    batchSize = null,
+    learningRate = null,
+    inputKey = "text_input",
+    outputKey = "output",
+    client = null,
+    requestOptions?: RequestOptions,
+  ): GenerativeModel {
+    if (!sourceModel.model) {
+      throw new GoogleGenerativeAIError(
+        `Must provide a model name. ` +
+        `Example: genai.getGenerativeModel({ model: 'my-model-name' })`,
+      );
+    }
+    if (!trainingData) {
+      throw new GoogleGenerativeAIRequestInputError(
+        "Cached content must contain a `trainingData` field.",
+      );
+    }
+
+    if (!client) {
+      client = getDe
+    }
+
+    /**
+     * Not checking tools and toolConfig for now as it would require a deep
+     * equality comparison and isn't likely to be a common case.
+     */
+    const disallowedDuplicates: Array<keyof ModelParams & keyof CachedContent> =
+      ["model", "systemInstruction"];
+
+    for (const key of disallowedDuplicates) {
+      if (
+        modelParams?.[key] &&
+        cachedContent[key] &&
+        modelParams?.[key] !== cachedContent[key]
+      ) {
+        if (key === "model") {
+          const modelParamsComp = modelParams.model.startsWith("models/")
+            ? modelParams.model.replace("models/", "")
+            : modelParams.model;
+          const cachedContentComp = cachedContent.model.startsWith("models/")
+            ? cachedContent.model.replace("models/", "")
+            : cachedContent.model;
+          if (modelParamsComp === cachedContentComp) {
+            continue;
+          }
+        }
+        throw new GoogleGenerativeAIRequestInputError(
+          `Different value for "${key}" specified in modelParams` +
+          ` (${modelParams[key]}) and cachedContent (${cachedContent[key]})`,
         );
       }
     }

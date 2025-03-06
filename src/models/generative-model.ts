@@ -253,4 +253,19 @@ export class GenerativeModel {
       generativeModelRequestOptions,
     );
   }
+
+
+  async tuneModel(params: TuneModelParams): Promise<TuneModelResponse> {
+    return tuneModel(this.apiKey, this.model, params);
+  }
+
+
+
+
+
+
+
+
+
+
 }

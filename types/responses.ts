@@ -89,6 +89,15 @@ export interface GenerateContentResponse {
 }
 
 /**
+ * Result object returned from generateContent() call.
+ *
+ * @public
+ */
+export interface FineTuneResponse {
+
+}
+
+/**
  * Logprobs Result
  * @public
  */

@@ -245,3 +245,20 @@ export interface CodeExecutionTool {
    */
   codeExecution: {};
 }
+
+
+
+/**
+ * Request sent to `finetune` endpoint.
+ * @public
+ */
+export interface FineTuneRequest extends BaseParams {
+  contents: Content[];
+  tools?: Tool[];
+  toolConfig?: ToolConfig;
+  systemInstruction?: string | Part | Content;
+  /**
+   * This is the name of a `CachedContent` and not the cache object itself.
+   */
+  cachedContent?: string;
+}

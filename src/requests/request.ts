@@ -40,6 +40,7 @@ export enum Task {
   COUNT_TOKENS = "countTokens",
   EMBED_CONTENT = "embedContent",
   BATCH_EMBED_CONTENTS = "batchEmbedContents",
+  FINE_TUNE = "tune"
 }
 
 export class RequestUrl {
